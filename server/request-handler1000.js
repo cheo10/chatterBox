@@ -1,51 +1,50 @@
 var _ = require('underscore');
 var url = require('url');
-var messages = [];
+var messages = {
+  results: []
+};
 
 var requestHandler = function(request, response) {
 
   console.log("Serving request type " + request.method + " for url " + request.url);
   var parsedUrl = url.parse(request.url); // /classes/name
   var pathName = parsedUrl.pathname;
-  console.log(pathName);
+  var headers = defaultCorsHeaders;
 
-
-  if(request.method === "GET" ){
-
-    var statusCode = 200;
-    var headers = defaultCorsHeaders;
-    headers['Content-Type'] = "application/json";
-
+  if(pathName !== '/classes/messages') {
+    var statusCode = 404;
     response.writeHead(statusCode, headers);
-    response.end( JSON.stringify({ results:[] }) );
+    response.end('Not Found!');
+  } else{
+    if(request.method === "GET" ){
 
-  } else if(request.method === "POST" ){
-    var statusCode = 201;
-    var headers = defaultCorsHeaders;
-    headers['Content-Type'] = "application/json";
-    response.writeHead(statusCode, headers);
+      var statusCode = 200;
 
-    var body = [];
+      response.writeHead(statusCode, headers);
+      response.end( JSON.stringify(messages) );
 
-    request.on('data', function(chunk){
-      body.push(chunk);
+    } else if(request.method === "POST" ){
+      var statusCode = 201;
+      response.writeHead(statusCode, headers);
 
-    });
+      var body = [];
 
-    request.on('end', function(){
-      body = Buffer.concat(body).toString();
-      messages.push( JSON.parse(body) );
-      response.end(JSON.stringify(body));
-      //response.end('posted');
-    });
+      request.on('data', function(chunk){
+        body.push(chunk);
 
-  } else if(request.method === "OPTIONS" ){
-    var statusCode = 200;
-    var headers = defaultCorsHeaders;
-    headers['Content-Type'] = "application/json";
+      });
 
-    response.writeHead(statusCode, headers);
-    response.end( 'options' );
+      request.on('end', function(){
+        body = Buffer.concat(body).toString();
+        messages.results.push( JSON.parse(body) );
+        response.end(JSON.stringify(body));
+
+      });
+    } else if(request.method === "OPTIONS" ){
+      var statusCode = 200;
+      response.writeHead(statusCode, headers);
+      response.end( 'options' );
+    }
   }
 };
 
@@ -62,7 +61,8 @@ var defaultCorsHeaders = {
   "access-control-allow-origin": "*",
   "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
   "access-control-allow-headers": "content-type, accept",
-  "access-control-max-age": 10 // Seconds.
+  "access-control-max-age": 10, // Seconds.
+  'Content-Type': 'application/json'
 };
 
 
