@@ -34,16 +34,10 @@ var requestHandler = function(request, response) {
 
     request.on('end', function(){
       body = Buffer.concat(body).toString();
-
-      if( _.contains(messages, body) ){
-        response.end(JSON.parse(body));
-      } else{
-        messages.push( JSON.parse(body) );
-        response.end('posted');
-      }
+      messages.push( JSON.parse(body) );
+      response.end(JSON.stringify(body));
+      //response.end('posted');
     });
-
-    console.log(messages);
 
   } else if(request.method === "OPTIONS" ){
     var statusCode = 200;
