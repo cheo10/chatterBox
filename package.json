@@ -2,8 +2,6 @@
   "name": "chatterbox",
   "version": "0.0.1",
   "main": "server/basic-server.js",
-  "author": "Hack Reactor Remote Beta",
-  "license": "Copyright 2013, Hack Reactor Remote Beta. All rights reserved.",
   "scripts": {
     "test": "mocha server/spec"
   },
